@@ -1,0 +1,9 @@
+# 忽略Python编译文件和缓存文件
+*.pyc
+__pycache__
+
+# 忽略PyCharm项目文件
+.idea/
+
+# 忽略本地配置文件
+*.env
