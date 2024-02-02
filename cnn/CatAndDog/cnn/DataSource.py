@@ -82,15 +82,42 @@ class DataSource(object):
 
     def cnnModels(self):
         models = keras.models.Sequential([
-            keras.layers.Conv2D(32, (3, 3), activation='relu', input_shape=(64, 64, 3)),
-            keras.layers.MaxPooling2D(2, 2),
-            keras.layers.Conv2D(64, (3, 3), activation='relu'),
-            keras.layers.MaxPooling2D(2, 2),
-            # keras.layers.Conv2D(128, (3, 3), activation='relu'),
-            # keras.layers.MaxPooling2D(2, 2),
+            keras.layers.Conv2D(64, (3, 3), activation='relu', padding='same', input_shape=(64, 64, 3)),
+            keras.layers.Conv2D(64, (3, 3), activation='relu', padding='same'),
+            keras.layers.MaxPooling2D((2, 2), strides=(2, 2)),
+
+            keras.layers.Conv2D(128, (3, 3), activation='relu', padding='same'),
+            keras.layers.Conv2D(128, (3, 3), activation='relu', padding='same'),
+            keras.layers.MaxPooling2D((2, 2), strides=(2, 2)),
+
+            keras.layers.Conv2D(256, (3, 3), activation='relu', padding='same'),
+            keras.layers.Conv2D(256, (3, 3), activation='relu', padding='same'),
+            keras.layers.Conv2D(256, (3, 3), activation='relu', padding='same'),
+            keras.layers.MaxPooling2D((2, 2), strides=(2, 2)),
+
+            keras.layers.Conv2D(512, (3, 3), activation='relu', padding='same'),
+            keras.layers.Conv2D(512, (3, 3), activation='relu', padding='same'),
+            keras.layers.Conv2D(512, (3, 3), activation='relu', padding='same'),
+            keras.layers.MaxPooling2D((2, 2), strides=(2, 2)),
+
+            keras.layers.Conv2D(512, (3, 3), activation='relu', padding='same'),
+            keras.layers.Conv2D(512, (3, 3), activation='relu', padding='same'),
+            keras.layers.Conv2D(512, (3, 3), activation='relu', padding='same'),
+            keras.layers.MaxPooling2D((2, 2), strides=(2, 2)),
+
             keras.layers.Flatten(),
-            keras.layers.Dense(512, activation='relu'),
+            keras.layers.Dense(4096, activation='relu'),
+            keras.layers.Dense(4096, activation='relu'),
             keras.layers.Dense(1, activation='softmax')
+            # keras.layers.Conv2D(32, (3, 3), activation='relu', padding='same', input_shape=(64, 64, 3)),
+            # keras.layers.MaxPooling2D(2, 2),
+            # keras.layers.Conv2D(64, (3, 3), activation='relu'),
+            # keras.layers.MaxPooling2D(2, 2),
+            # # keras.layers.Conv2D(128, (3, 3), activation='relu'),
+            # # keras.layers.MaxPooling2D(2, 2),
+            # keras.layers.Flatten(),
+            # keras.layers.Dense(512, activation='relu'),
+            # keras.layers.Dense(1, activation='softmax')
         ])
 
         models.summary()
@@ -111,7 +138,7 @@ class DataSource(object):
             self.train_images,
             self.train_labels,
             validation_data=self.validation_data,
-            epochs=5
+            epochs=10
         )
 
 
