@@ -87,16 +87,21 @@ class DataSource(object):
             plt.title('cat' if label == 1 else 'dog')
         plt.show()
 
-        # 训练模型
-        self.cnnModels(img_width, img_height, num_classes=num_classes,
-                       train_generator=train_generator,
-                       validation_generator=validation_generator,
-                       nb_train_samples=nb_train_samples,
-                       nb_validation_samples=nb_validation_samples,
-                       nb_test_samples=nb_test_samples)
+        # 使用 GPU 训练模型
+        physical_gpu_device = tf.config.list_physical_devices("GPU")
+        # 开启 GPU 内存动态管理（动态增长）
+        tf.config.experimental.set_memory_growth(physical_gpu_device[0], True)
+        with tf.device("/GPU:0"):
+            # 训练模型
+            self.cnnModels(img_width, img_height, num_classes=num_classes,
+                           train_generator=train_generator,
+                           validation_generator=validation_generator,
+                           nb_train_samples=nb_train_samples,
+                           nb_validation_samples=nb_validation_samples,
+                           nb_test_samples=nb_test_samples)
 
-
-    def cnnModels(self, img_width, img_height, num_classes, train_generator, validation_generator, nb_train_samples, nb_validation_samples, nb_test_samples):
+    def cnnModels(self, img_width, img_height, num_classes, train_generator, validation_generator, nb_train_samples,
+                  nb_validation_samples, nb_test_samples):
         base_model = InceptionResNetV2(
             weights='imagenet',
             include_top=False,
@@ -128,7 +133,8 @@ class DataSource(object):
             metrics=['accuracy']
         )
         # 保存模型
-        save_checkpoint = keras.callbacks.ModelCheckpoint(filepath='model.h5', monitor='val_loss', save_best_only=True, verbose=1)
+        save_checkpoint = keras.callbacks.ModelCheckpoint(filepath='model.h5', monitor='val_loss', save_best_only=True,
+                                                          verbose=1)
         early_stopping = keras.callbacks.EarlyStopping(monitor='val_loss', patience=5, verbose=True)
 
         history = model.fit(
@@ -146,4 +152,3 @@ if __name__ == "__main__":
     ds = DataSource()
     # ds.cnnModels()
     # ds.training()
-
