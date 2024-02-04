@@ -1,5 +1,5 @@
 # @Author   : Steafan
-# @Desc     : 猫狗识别CNN实现
+# @Desc     : 猫狗识别CNN实现(暂时废弃)
 # @File     : CNN.py
 # @Create   : 2024-02-01 15:44
 
