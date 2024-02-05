@@ -165,7 +165,7 @@ class DataSource(object):
         cm = confusion_matrix(test_generator.classes, y_pred)
         # 热力图
         plt.figure(figsize=(8, 6))
-        sns.heatmap(cm, annot=True, fmt='d', cbar=True, cmap='Blues', xticklabes=classes, yticklabels=classes)
+        sns.heatmap(cm, annot=True, fmt='d', cbar=True, cmap='Blues', xticklabels=classes, yticklabels=classes)
         plt.xlabel('Predicted label')
         plt.ylabel('True label')
         plt.title('Confusion Matrix')
