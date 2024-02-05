@@ -7,9 +7,12 @@ import tensorflow as tf
 from tensorflow import keras
 from keras.preprocessing.image import ImageDataGenerator
 from keras.applications.inception_resnet_v2 import InceptionResNetV2, preprocess_input
+from sklearn.metrics import  confusion_matrix
 import numpy as np
 import pathlib as path
 import matplotlib.pyplot as plt
+import seaborn as sns
+sns.set(style='darkgrid', font_scale=1.4)
 
 
 class DataSource(object):
@@ -98,10 +101,12 @@ class DataSource(object):
                            validation_generator=validation_generator,
                            nb_train_samples=nb_train_samples,
                            nb_validation_samples=nb_validation_samples,
-                           nb_test_samples=nb_test_samples)
+                           nb_test_samples=nb_test_samples,
+                           test_generator=test_generator,
+                           classes=classes)
 
     def cnnModels(self, img_width, img_height, num_classes, train_generator, validation_generator, nb_train_samples,
-                  nb_validation_samples, nb_test_samples):
+                  nb_validation_samples, nb_test_samples, test_generator, classes):
         base_model = InceptionResNetV2(
             weights='imagenet',
             include_top=False,
@@ -146,6 +151,50 @@ class DataSource(object):
             verbose=True,
             validation_steps=nb_validation_samples // 16
         )
+        # 训练结果和损失、准确率可视化展示
+        self.trainingAndValidationLossAndAccuracyVisualization(history)
+        # 模型评估
+        validation_evaluate_score = model.evaluate(validation_generator, verbose=False)
+        print('Val loss:', validation_evaluate_score[0])
+        print('Val accuracy:', validation_evaluate_score[1])
+        test_evaluate_score = model.evaluate(test_generator, verbose=False)
+        print('Test loss:', test_evaluate_score[0])
+        print('Test accuracy:', test_evaluate_score[1])
+        # 混淆矩阵
+        y_pred = np.argmax(model.predict(test_generator), axis=1)
+        cm = confusion_matrix(test_generator.classes, y_pred)
+        # 热力图
+        plt.figure(figsize=(8, 6))
+        sns.heatmap(cm, annot=True, fmt='d', cbar=True, cmap='Blues', xticklabes=classes, yticklabels=classes)
+        plt.xlabel('Predicted label')
+        plt.ylabel('True label')
+        plt.title('Confusion Matrix')
+        plt.show()
+
+    # 将模型训练和验证的损失可视化出来、以及训练和验证的准确率
+    def trainingAndValidationLossAndAccuracyVisualization(self, history):
+        history_dic = history.history
+        loss_values = history_dic['loss']
+        val_loss_values = history_dic['val_loss']
+        epochs_x = range(1, len(loss_values) + 1)
+        plt.figure(figsize=(10, 10))
+        plt.subplot(2, 1, 1)
+        plt.plot(epochs_x, loss_values, 'b-o', label='Training loss')
+        plt.plot(epochs_x, val_loss_values, 'r-o', label='Validation loss')
+        plt.title('Training and Validation Loss')
+        plt.xlabel('Epochs')
+        plt.ylabel('Loss')
+        plt.subplot(2, 1, 2)
+        acc_values = history_dic['accuracy']
+        val_acc_values = history_dic['val_accuracy']
+        plt.plot(epochs_x, acc_values, 'b-o', label='Training acc')
+        plt.plot(epochs_x, val_acc_values, 'r-o', label='Validation acc')
+        plt.title('Training and Validation Accuracy')
+        plt.xlabel('Epochs')
+        plt.ylabel('Acc')
+        plt.legend()
+        plt.tight_layout()
+        plt.show()
 
 
 if __name__ == "__main__":
